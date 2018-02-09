@@ -1,0 +1,62 @@
+<html>
+    <head>
+    <meta charset='utf-8'>
+        <title>Survey</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type ="text/javascript">
+            console.log("initial");
+            $(document).ready(function(){
+                console.log("Document ready");
+                 var socket = io.connect(); //instantiated a variable called socket 
+                 //socket code here 
+                 $('#form').submit(function(){ //emit the target data to the server
+                    console.log('click');
+                    var results = {
+                        name: $("#name").val(),
+                        location: $("#location").val(),
+                        language: $("#language").val(),
+                        comment: $("#comment").val(),
+                    };
+                    console.log("Data in .submit in EJS", results);
+                    
+                    socket.emit('form_submit', results);
+                    return false;
+                 });
+                 socket.on('server_response', function(data){
+                     console.log('server responded');
+                     document.getElementById('form_info').innerHTML=
+                     `<p>Name: ${data.form.name}</p>
+                     <p>Location: ${data.form.location}</p>
+                     <p>Language: ${data.form.language}</p>
+                     <p>Comments: ${data.form.comment}</p>
+                     <p>Lucky number: ${data.number}</p>` 
+
+                 });
+            })
+        </script>
+    </head>
+    <body>
+        <div id="form_info"></div>
+            <h2>index.ejs - Survey Form</h2>
+            <form id="form">
+                <div>Your Name:<input id="name" type='text' name='name'></div>
+                <div>Dojo Location: <select name='location' id='location'  name='location'>
+                        <option name='Mountain View' value='Mountain View'>Mountain         View</option>
+                        <option name='Seattle' value='Seattle'>Seattle</option>
+                        <option name='DC' value='DC'>DC</option>
+                    </select>
+                    </div>
+                <div>Favorite Language:<select class='selectpicker' id='language'    data-style='btn-info' name='language'>
+                    <option name='JavaScript' value='JavaScript'>JavaScript</option>
+                    <option name='Python' value='Python'>Python</option>
+                    <option name='Ruby' value='Ruby'>Ruby</option>
+                    </select>
+                </div>
+               Comment (optional): 
+                <div><textarea name='comment' id='comment' cols='30' rows='10'></textarea>
+                </div>
+                    <input id="submit" type='submit' value='submit'>
+            </form>
+    </body>
+</html>
